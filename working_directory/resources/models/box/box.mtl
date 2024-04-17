@@ -1,0 +1,42 @@
+# Blender 4.0.2 MTL File: 'Asset collection.blend'
+# www.blender.org
+
+newmtl metal_box
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd metal_box.jpg
+
+newmtl metal_box_emission
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd metal_box.jpg
+map_Ke metal_box.jpg
+
+newmtl reflecto_cube_glass
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd reflecto_cube_glass.jpg
+
+newmtl reflecto_cube_shell
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd reflecto_cube_shell.jpg
