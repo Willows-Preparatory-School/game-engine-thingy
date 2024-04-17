@@ -11,4 +11,8 @@ HOW DO I RUN THIS MESS: <br>
 if you (for some reason) want to run this engine, <br>
 clone the github repo, then open it in intellij, <br>
 then, there should be a run config i've already created so just run that and hope it works. ^w^ <br>
+ABOUT WORKING_DIRECTORY: <br>
+the ``working_directory/`` folder is where all the game's assets and engine's shaders are held, <br>
+when running the engine as a standalone ``.jar``, <br>
+**make sure** to point it's working directory to that folder <br>
 :3 <br>
