@@ -143,7 +143,7 @@ public class Main implements IAppLogic {
 //        lightControls = new LightControls(scene);
 //        scene.setGuiInstance(lightControls);
 
-        if (true){ // skybox toggle
+        if (false){ // skybox toggle
             SkyBox skyBox = new SkyBox("resources/models/skybox/skybox.obj", scene.getTextureCache());
             skyBox.getSkyBoxEntity().setScale(100);
             scene.setSkyBox(skyBox);
