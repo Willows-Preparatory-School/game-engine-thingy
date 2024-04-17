@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Game Run" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="Game.Main" />
+    <module name="game-engine-thingy" />
+    <option name="WORKING_DIRECTORY" value="$ProjectFileDir$/working_directory" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
