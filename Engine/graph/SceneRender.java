@@ -1,5 +1,6 @@
 package Engine.graph;
 
+import Engine.scene.AnimationData;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import Engine.scene.Entity;
@@ -45,6 +46,7 @@ public class SceneRender {
         uniformsMap.createUniform("material.hasNormalMap");
         uniformsMap.createUniform("ambientLight.factor");
         uniformsMap.createUniform("ambientLight.color");
+        uniformsMap.createUniform("bonesMatrices");
 
         for (int i = 0; i < MAX_POINT_LIGHTS; i++) {
             String name = "pointLights[" + i + "]";
@@ -127,6 +129,12 @@ public class SceneRender {
                         uniformsMap.setUniform("modelMatrix", entity.getModelMatrix());
                         uniformsMap.setUniform("projectionMatrix", scene.getProjection().getProjMatrix());
                         uniformsMap.setUniform("viewMatrix", scene.getCamera().getViewMatrix());
+                        AnimationData animationData = entity.getAnimationData();
+                        if (animationData == null) {
+                            uniformsMap.setUniform("bonesMatrices", AnimationData.DEFAULT_BONES_MATRICES);
+                        } else {
+                            uniformsMap.setUniform("bonesMatrices", animationData.getCurrentFrame().boneMatrices());
+                        }
                         glDrawElements(GL_TRIANGLES, mesh.getNumVertices(), GL_UNSIGNED_INT, 0);
                     }
                 }

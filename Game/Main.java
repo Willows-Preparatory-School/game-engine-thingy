@@ -30,6 +30,7 @@ public class Main implements IAppLogic {
     private Entity pointEntity;
     private Entity spotEntity;
     private Entity dirEntity;
+    private AnimationData animationData;
 
     private Vector4f displInc = new Vector4f();
     private float rotation;
@@ -94,15 +95,15 @@ public class Main implements IAppLogic {
 
         String quadModelId = "quad-model";
         Model quadModel = ModelLoader.loadModel("quad-model", "resources/models/quad/quad.obj",
-                scene.getTextureCache());
+                scene.getTextureCache(), false);
         scene.addModel(quadModel);
 
         Model cubeModel = ModelLoader.loadModel("cube-model", "resources/models/cube/cube.obj",
-                scene.getTextureCache());
+                scene.getTextureCache(), false);
         scene.addModel(cubeModel);
 
         Model coneModel = ModelLoader.loadModel("cone-model", "resources/models/cone/cone.obj",
-                scene.getTextureCache());
+                scene.getTextureCache(), false);
         scene.addModel(coneModel);
 
         cubeEntity = new Entity("cube-entity", cubeModel.getId());
@@ -162,7 +163,7 @@ public class Main implements IAppLogic {
 
         String wallNoNormalsModelId = "quad-no-normals-model";
         Model quadModelNoNormals = ModelLoader.loadModel(wallNoNormalsModelId, "resources/models/wall/wall_nonormals.obj",
-                scene.getTextureCache());
+                scene.getTextureCache(), false);
         scene.addModel(quadModelNoNormals);
 
         Entity wallLeftEntity = new Entity("wallLeftEntity", wallNoNormalsModelId);
@@ -173,7 +174,7 @@ public class Main implements IAppLogic {
 
         String wallModelId = "quad-model-normals";
         Model quadModel2 = ModelLoader.loadModel(wallModelId, "resources/models/wall/wall.obj",
-                scene.getTextureCache());
+                scene.getTextureCache(), false);
         scene.addModel(quadModel2);
 
         Entity wallRightEntity = new Entity("wallRightEntity", wallModelId);
@@ -181,6 +182,17 @@ public class Main implements IAppLogic {
         wallRightEntity.setScale(2.0f);
         wallRightEntity.updateModelMatrix();
         scene.addEntity(wallRightEntity);
+
+//        String bobModelId = "bobModel";
+//        Model bobModel = ModelLoader.loadModel(bobModelId, "resources/models/bob/boblamp.md5mesh",
+//                scene.getTextureCache(), true);
+//        scene.addModel(bobModel);
+//        Entity bobEntity = new Entity("bobEntity", bobModelId);
+//        bobEntity.setScale(0.05f);
+//        bobEntity.updateModelMatrix();
+//        animationData = new AnimationData(bobModel.getAnimationList().get(0));
+//        bobEntity.setAnimationData(animationData);
+//        scene.addEntity(bobEntity);
 
         DirLight dirLight = sceneLights.getDirLight();
         dirLight.setPosition(1, 1, 0);
@@ -244,5 +256,6 @@ public class Main implements IAppLogic {
 //        spotEntity.updateModelMatrix();
 //        dirEntity.updateModelMatrix();
 //        pointEntity.updateModelMatrix();
+        //animationData.nextFrame();
     }
 }
