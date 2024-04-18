@@ -1,9 +1,6 @@
 package network_test;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -13,38 +10,100 @@ public class Server
     static int PORT = 5000; // What port do we listen on?
 
     // Misc
-    static boolean isRunning = false;
+    boolean isRunning = false;
+    private ServerSocket serverSocket;
+
+    // Funcs
+    public Server(int port) throws IOException
+    {
+        serverSocket = new ServerSocket(port);
+    }
+
+    public void start() throws IOException
+    {
+        isRunning = true;
+        System.out.println("Reached server start() func...");
+        System.out.println("Waiting for clients...");
+        while (isRunning)
+        {
+            Socket clientSocket = serverSocket.accept();
+            new ClientHandler(clientSocket).start();
+        }
+    }
 
     public static void main(String args[]) throws IOException
     {
         System.out.println("Hello from server!");
-        ServerSocket serverSocket = new ServerSocket(PORT);
-        System.out.println("Started server on port: " + serverSocket.getLocalPort());
-
-        isRunning = true;
-        while (isRunning)
+        try
         {
-            System.out.println("Waiting for client connection...");
-            Socket clientSocket = serverSocket.accept(); // Client connection
-            System.out.println("Client connected.");
+            System.out.println("Trying to run server on port: " + PORT);
+            Server server = new Server(PORT);
+            server.start();
+        }
+        catch (IOException e)
+        {
+            System.out.println("Uh oh, something went wrong...");
+            e.printStackTrace();
+        }
+    }
 
-            BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-            PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+    private static class ClientHandler extends Thread
+    {
+        boolean isRunning = false;
 
-            String inputLine;
-            while ((inputLine = in.readLine()) != null) {
-                System.out.println("Received: " + inputLine);
-                out.println("Server received: " + inputLine);
-                if (inputLine.equals("exit")) {
-                    System.out.println("Received exit command, exiting...");
-                    isRunning = false;
-                    break;
+        private Socket clientSocket;
+        private DataInputStream in;
+        private DataOutputStream out;
+
+        public ClientHandler(Socket socket)
+        {
+            this.clientSocket = socket;
+        }
+
+        public void run()
+        {
+            isRunning = true;
+            System.out.println("Received client connection...");
+            try
+            {
+                in = new DataInputStream(clientSocket.getInputStream());
+                out = new DataOutputStream(clientSocket.getOutputStream());
+
+                out.writeUTF("What is your name?");
+                String userName = in.readUTF();
+                out.writeUTF("Hello " + userName);
+
+                while (isRunning)
+                {
+                    String clientMessage = in.readUTF();
+                    out.writeUTF(clientMessage);
+                    if(clientMessage.equals("exit"))
+                    {
+                        out.writeUTF("got exit command, goodbye.");
+                        // got exit command, exit
+                        isRunning = false;
+                    }
                 }
             }
-
-            in.close();
-            out.close();
-            clientSocket.close();
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+            finally
+            {
+                try
+                {
+                    in.close();
+                    out.close();
+                    clientSocket.close();
+                }
+                catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 }
+
+

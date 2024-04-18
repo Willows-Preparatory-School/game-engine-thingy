@@ -1,10 +1,7 @@
 package network_test;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.Socket;
+import java.io.*;
+import java.net.*;
 
 public class Client
 {
@@ -22,19 +19,25 @@ public class Client
         Socket socket = new Socket(HOST, PORT); // Connect to the server
         System.out.println("Connected to server!");
 
-        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+        DataInputStream in = new DataInputStream(socket.getInputStream());
+        DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+
+        // Wait for the server's message asking for the name
+        String serverMessage = in.readUTF();
+        System.out.println(serverMessage);
 
         BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
-        String userInput;
+        String userName = stdIn.readLine();
+        out.writeUTF(userName); // Send the name to the server
 
+        // After sending the name, wait for the server's greeting to prevent a strange desync.
+        String serverResponse = in.readUTF();
+        System.out.println(serverResponse);
+
+        String userInput;
         while ((userInput = stdIn.readLine()) != null) {
-            out.println(userInput);
-            System.out.println("Server response: " + in.readLine());
-            if (userInput.equals("exit")) {
-                System.out.println("Received exit command, exiting...");
-                break;
-            }
+            out.writeUTF(userInput);
+            System.out.println("Server response: " + in.readUTF());
         }
 
         in.close();
