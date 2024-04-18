@@ -15,4 +15,6 @@ then, there should be a run config i've already created so just run that and hop
 the ``working_directory/`` folder is where all the game's assets and engine's shaders are held, <br>
 when running the engine as a standalone ``.jar``, <br>
 **make sure** to point it's working directory to that folder <br>
+### Extra notes:
+im not the best at java, so pull requests are welcome :3 <br>
 :3 <br>
