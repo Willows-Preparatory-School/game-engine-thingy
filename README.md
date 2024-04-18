@@ -17,4 +17,5 @@ when running the engine as a standalone ``.jar``, <br>
 **make sure** to point it's working directory to that folder <br>
 ### Extra notes:
 im not the best at java, so pull requests are welcome :3 <br>
+oh and if you see commits from the account ``Spicy-Axolotl``, then that's my other account i use <br>
 :3 <br>
