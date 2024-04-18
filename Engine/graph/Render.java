@@ -5,6 +5,7 @@ import Engine.Window;
 import Engine.scene.Scene;
 
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL13.*;
 
 public class Render {
 
@@ -14,9 +15,13 @@ public class Render {
 
     public Render(Window window) {
         GL.createCapabilities();
+        glEnable(GL_MULTISAMPLE);
         glEnable(GL_DEPTH_TEST);
-        glEnable(GL_CULL_FACE);
-        glCullFace(GL_BACK);
+
+        // removed for multisampling and antialiasing
+        //glEnable(GL_CULL_FACE);
+        //glCullFace(GL_BACK);
+
         sceneRender = new SceneRender();
         guiRender = new GuiRender(window);
         skyBoxRender = new SkyBoxRender();
