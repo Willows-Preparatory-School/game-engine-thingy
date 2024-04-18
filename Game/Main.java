@@ -52,6 +52,7 @@ public class Main implements IAppLogic {
         Window.WindowOptions windowOptions = new Window.WindowOptions();
         windowOptions.height = 600;
         windowOptions.width = 800;
+        windowOptions.fps = 60;
         Logger.info("Starting engine...");
         Engine gameEng = new Engine("game engine thingy >:3", windowOptions, main);
         gameEng.start();
