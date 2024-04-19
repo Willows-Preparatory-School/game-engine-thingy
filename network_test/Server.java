@@ -64,6 +64,12 @@ public class Server
         {
             isRunning = true;
             System.out.println("Received client connection...");
+            System.out.println("Client Address: " + clientSocket.getInetAddress());
+            System.out.println("Client Port: " + clientSocket.getPort());
+            System.out.println("Client Channel: " + clientSocket.getChannel());
+            System.out.println("Client local address: " + clientSocket.getLocalAddress());
+            System.out.println("Client local port: " + clientSocket.getLocalPort());
+
             try
             {
                 in = new DataInputStream(clientSocket.getInputStream());
