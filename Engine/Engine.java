@@ -3,6 +3,8 @@ package Engine;
 import Engine.graph.Render;
 import Engine.scene.Scene;
 
+import java.util.Arrays;
+
 public class Engine {
 
     public static final int TARGET_UPS = 30;
@@ -13,15 +15,40 @@ public class Engine {
     private Scene scene;
     private int targetFps;
     private int targetUps;
+    private String[] engineArgs;
 
-    public Engine(String windowTitle, Window.WindowOptions opts, IAppLogic appLogic) {
+    // Config:
+    boolean devMode = false;
+    boolean serverMode = false;
+
+    public Engine(String windowTitle, Window.WindowOptions opts, String[] args, IAppLogic appLogic)
+    {
+        this.engineArgs = args;
+        System.out.println("INFO: Engine; running with args: " + Arrays.toString(this.engineArgs));
+
         window = new Window(windowTitle, opts, () -> {
             resize();
             return null;
         });
-        targetFps = opts.fps;
-        targetUps = opts.ups;
+        this.targetFps = opts.fps;
+        this.targetUps = opts.ups;
         this.appLogic = appLogic;
+
+        // Args, TODO: maybe use a switch statement?
+        // Developer mode.
+        if(Arrays.asList(this.engineArgs).contains("-dev"))
+        {
+            this.devMode = true;
+            System.out.println("Running in dev mode...");
+            // TODO: perhaps change the window title if dev mode is on.
+        }
+        // Server mode.
+        else if(Arrays.asList(this.engineArgs).contains("-server"))
+        {
+            this.serverMode = true;
+            System.out.println("Running in server mode...");
+        }
+
         render = new Render(window);
         scene = new Scene(window.getWidth(), window.getHeight());
         appLogic.init(window, scene, render);
@@ -91,4 +118,13 @@ public class Engine {
         running = false;
     }
 
+    public boolean isDevMode()
+    {
+        return devMode;
+    }
+
+    public boolean isServerMode()
+    {
+        return serverMode;
+    }
 }

@@ -20,7 +20,8 @@ import org.joml.*;
 
 import static org.lwjgl.glfw.GLFW.*;
 
-public class Main implements IAppLogic {
+public class Main implements IAppLogic
+{
     private static final float MOUSE_SENSITIVITY = 0.1f;
     private static final float MOVEMENT_SPEED = 0.005f;
     private static final int NUM_CHUNKS = 4;
@@ -56,7 +57,7 @@ public class Main implements IAppLogic {
         //windowOptions.fps = 60;
         windowOptions.antiAliasing = true;
         Logger.info("Starting engine...");
-        Engine gameEng = new Engine("game engine thingy >:3", windowOptions, main);
+        Engine gameEng = new Engine("game engine thingy >:3", windowOptions, args, main);
         gameEng.start();
     }
 /*
