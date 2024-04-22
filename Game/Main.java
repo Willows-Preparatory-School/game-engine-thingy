@@ -1,9 +1,14 @@
 package Game;
 
+import Engine.sound.SoundBuffer;
+import Engine.sound.SoundListener;
+import Engine.sound.SoundManager;
+import Engine.sound.SoundSource;
 import imgui.ImGui;
 import imgui.ImGuiIO;
 import imgui.flag.ImGuiCond;
 import org.joml.Math;
+import org.lwjgl.openal.AL11;
 import org.lwjglx.debug.Log;
 import org.tinylog.Logger;
 import org.tinylog.core.LogEntry;
@@ -15,6 +20,7 @@ import Engine.scene.lights.*;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.joml.*;
 
@@ -36,6 +42,11 @@ public class Main implements IAppLogic
     private Vector4f displInc = new Vector4f();
     private float rotation;
     private LightControls lightControls;
+    private SoundSource playerSoundSource;
+    private SoundManager soundMgr;
+
+    // Config
+    private static boolean noSound = false;
 
     public Main() {
     }
@@ -56,6 +67,16 @@ public class Main implements IAppLogic
         windowOptions.width = 800;
         //windowOptions.fps = 60;
         windowOptions.antiAliasing = true;
+
+        System.out.println("INFO: Game; running with args: " + Arrays.toString(args));
+
+        // No sound mode.
+        if(Arrays.asList(args).contains("-nosound"))
+        {
+            noSound = true;
+            System.out.println("Running in nosound mode... No sound will be played.");
+        }
+
         Logger.info("Starting engine...");
         Engine gameEng = new Engine("game engine thingy >:3", windowOptions, args, main);
         gameEng.start();
@@ -85,13 +106,17 @@ public class Main implements IAppLogic
     }
      */
 
+
     @Override
-    public void cleanup() {
-        // Nothing to be done yet
+    public void cleanup()
+    {
         Logger.debug("Game; cleanup.");
+        if(!noSound)
+            soundMgr.cleanup(); // Soundmgr cleanup.
     }
 
-    public void init(Window window, Scene scene, Render render) {
+    public void init(Window window, Scene scene, Render render)
+    {
         Logger.info("Starting game init...");
 
         String quadModelId = "quad-model";
@@ -199,6 +224,29 @@ public class Main implements IAppLogic
         dirLight.setPosition(1, 1, 0);
         dirLight.setIntensity(1.0f);
         scene.setSceneLights(sceneLights);
+
+        if(!noSound)
+            initSounds(scene.getCamera().getPosition(), scene.getCamera());
+    }
+
+    private void initSounds(Vector3f position, Camera camera) {
+        soundMgr = new SoundManager();
+        soundMgr.setAttenuationModel(AL11.AL_EXPONENT_DISTANCE);
+        soundMgr.setListener(new SoundListener(camera.getPosition()));
+
+        SoundBuffer buffer = new SoundBuffer("resources/sounds/creak1.ogg");
+        soundMgr.addSoundBuffer(buffer);
+        playerSoundSource = new SoundSource(false, false);
+        playerSoundSource.setPosition(position);
+        playerSoundSource.setBuffer(buffer.getBufferId());
+        soundMgr.addSoundSource("CREAK", playerSoundSource);
+
+        buffer = new SoundBuffer("resources/sounds/woo_scary.ogg");
+        soundMgr.addSoundBuffer(buffer);
+        SoundSource source = new SoundSource(true, true);
+        source.setBuffer(buffer.getBufferId());
+        soundMgr.addSoundSource("MUSIC", source);
+        source.play();
     }
 
     public void input(Window window, Scene scene, long diffTimeMillis, boolean inputConsumed) {
@@ -229,6 +277,9 @@ public class Main implements IAppLogic
             camera.addRotation((float) Math.toRadians(-displVec.x * MOUSE_SENSITIVITY),
                     (float) Math.toRadians(-displVec.y * MOUSE_SENSITIVITY));
         }
+
+        if(!noSound)
+            soundMgr.updateListenerPosition(camera);
     }
 
     @Override
@@ -258,5 +309,7 @@ public class Main implements IAppLogic
 //        dirEntity.updateModelMatrix();
 //        pointEntity.updateModelMatrix();
         //animationData.nextFrame();
+
+        // playerSoundSource.play(); // How to trigger sound.
     }
 }
