@@ -77,6 +77,9 @@ public class Main implements IAppLogic
             System.out.println("Running in nosound mode... No sound will be played.");
         }
 
+        // Force disable sound.
+        noSound = true;
+
         Logger.info("Starting engine...");
         Engine gameEng = new Engine("game engine thingy >:3", windowOptions, args, main);
         gameEng.start();

@@ -9,6 +9,7 @@ if you wanna move the camera around, hold right click to turn camera view, <br>
 then use W A S and D to move the camera around. <br>
 i also have just some random copyright free background noise to test sound and stuff <br>
 if you want to run without sound enabled, run the run config called ``Game Run NoSound`` :3 <br>
+NOTE: currently i've force disabled sound, however if you want it, it shouldn't be too hard to patch :3 <br>
 ### HOW DO I RUN THIS MESS: <br>
 if you (for some reason) want to run this engine, <br>
 clone the github repo, then open it in intellij, <br>
