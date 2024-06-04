@@ -137,7 +137,7 @@ public class Main implements IAppLogic
         scene.addModel(coneModel);
 
         Model testModel = ModelLoader.loadModel("test-model",
-                "resources/models/test/forklift.mdl",
+                "resources/models/test/osprey.mdl",
                 scene.getTextureCache(), false);
         scene.addModel(testModel);
 
@@ -146,8 +146,10 @@ public class Main implements IAppLogic
         scene.addEntity(cubeEntity);
 
         testEntity = new Entity("test-entity", testModel.getId());
-        testEntity.setPosition(0, 0, 2);
-        testEntity.setScale(0.1f);
+        testEntity.setPosition(-8, 3, 2);
+        //animationData = new AnimationData(testModel.getAnimationList().get(0));
+        //testEntity.setAnimationData(animationData);
+        //testEntity.updateModelMatrix();
         scene.addEntity(testEntity);
 //
 //        pointEntity = new Entity("pointEntity-entity", coneModel.getId());
@@ -200,6 +202,9 @@ public class Main implements IAppLogic
         //cubeEntity.setRotation(0, 1, 0, 80);
         cubeEntity.setPosition(0, 0.0f, -0.7f);
         cubeEntity.updateModelMatrix(); // idk why we need this, but we do :3
+
+        testEntity.setScale(0.01f);
+        testEntity.updateModelMatrix();
 
         String wallNoNormalsModelId = "quad-no-normals-model";
         Model quadModelNoNormals = ModelLoader.loadModel(wallNoNormalsModelId, "resources/models/wall/wall_nonormals.obj",
@@ -303,8 +308,9 @@ public class Main implements IAppLogic
         if (rotation > 360) {
             rotation = 0;
         }
-        cubeEntity.setRotation(1, 1, 1, (float) Math.toRadians(rotation));
+        testEntity.setRotation(1, 1, 1, (float) Math.toRadians(rotation));
          */
+
         //cubeEntity.updateModelMatrix();
 
         //TODO: There are better ways to do this >w<
