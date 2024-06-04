@@ -34,6 +34,7 @@ public class Main implements IAppLogic
 
     private Entity[][] terrainEntities;
     private Entity cubeEntity;
+    private Entity testEntity;
     private Entity pointEntity;
     private Entity spotEntity;
     private Entity dirEntity;
@@ -135,9 +136,19 @@ public class Main implements IAppLogic
                 scene.getTextureCache(), false);
         scene.addModel(coneModel);
 
+        Model testModel = ModelLoader.loadModel("test-model",
+                "resources/models/test/forklift.mdl",
+                scene.getTextureCache(), false);
+        scene.addModel(testModel);
+
         cubeEntity = new Entity("cube-entity", cubeModel.getId());
         cubeEntity.setPosition(0, 0, -2);
         scene.addEntity(cubeEntity);
+
+        testEntity = new Entity("test-entity", testModel.getId());
+        testEntity.setPosition(0, 0, 2);
+        testEntity.setScale(0.1f);
+        scene.addEntity(testEntity);
 //
 //        pointEntity = new Entity("pointEntity-entity", coneModel.getId());
 //        pointEntity.setPosition(0, 0, -2);

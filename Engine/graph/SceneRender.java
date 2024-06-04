@@ -104,7 +104,7 @@ public class SceneRender {
             for (Material material : model.getMaterialList()) {
                 uniformsMap.setUniform("material.ambient", material.getAmbientColor());
                 uniformsMap.setUniform("material.diffuse", material.getDiffuseColor());
-                uniformsMap.setUniform("material.specular", material.getSpecularColor());
+                //uniformsMap.setUniform("material.specular", material.getSpecularColor());
                 uniformsMap.setUniform("material.reflectance", material.getReflectance());
                 String normalMapPath = material.getNormalMapPath();
                 boolean hasNormalMapPath = normalMapPath != null;
@@ -124,7 +124,7 @@ public class SceneRender {
                     for (Entity entity : entities) {
                         uniformsMap.setUniform("material.ambient", material.getAmbientColor());
                         uniformsMap.setUniform("material.diffuse", material.getDiffuseColor());
-                        uniformsMap.setUniform("material.specular", material.getSpecularColor());
+                        //uniformsMap.setUniform("material.specular", material.getSpecularColor());
                         uniformsMap.setUniform("material.reflectance", material.getReflectance());
                         uniformsMap.setUniform("modelMatrix", entity.getModelMatrix());
                         uniformsMap.setUniform("projectionMatrix", scene.getProjection().getProjMatrix());
