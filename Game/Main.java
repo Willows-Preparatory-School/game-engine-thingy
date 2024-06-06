@@ -317,6 +317,22 @@ public class Main implements IAppLogic
 
         ospreyEntity.updateModelMatrix();
 
+        // Calculate the angle for each color component (red, green, blue)
+        double redAngle = Math.toRadians(0); // Starting with red
+        double greenAngle = Math.toRadians(120); // Moving to green
+        double blueAngle = Math.toRadians(240); // Moving to blue
+
+        // Calculate the hue based on the current time
+        long currentTime = System.currentTimeMillis();
+        double hue = (currentTime % 10000L) / 10000.0; // Normalize to [0, 1]
+
+        // Calculate the final RGB values
+        int red = (int) (255 * Math.sin(hue + redAngle));
+        int green = (int) (255 * Math.sin(hue + greenAngle));
+        int blue = (int) (255 * Math.sin(hue + blueAngle));
+
+        //scene.getSceneLights().getPointLights().get(0).setColor(new Vector3f(red, green, blue));
+
         //TODO: There are better ways to do this >w<
 //        SceneLights sceneLights = scene.getSceneLights();
 //        SpotLight spotLight = sceneLights.getSpotLights().get(0);
