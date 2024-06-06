@@ -28,6 +28,7 @@ public class Main implements IAppLogic
     private Entity[][] terrainEntities;
     private Entity cubeEntity;
     private Entity ospreyEntity;
+    private Entity computerEntity;
     private Entity pointEntity;
     private Entity spotEntity;
     private Entity dirEntity;
@@ -134,6 +135,11 @@ public class Main implements IAppLogic
                 scene.getTextureCache(), false);
         scene.addModel(ospreyModel);
 
+        //Model computerModel = ModelLoader.loadModel("computer-model",
+                //"resources/models/box/box2.obj",
+                //scene.getTextureCache(), false);
+        //scene.addModel(computerModel);
+
         cubeEntity = new Entity("cube-entity", cubeModel.getId());
         cubeEntity.setPosition(0, 0, -2);
         scene.addEntity(cubeEntity);
@@ -144,6 +150,10 @@ public class Main implements IAppLogic
         //testEntity.setAnimationData(animationData);
         //testEntity.updateModelMatrix();
         scene.addEntity(ospreyEntity);
+
+        //computerEntity = new Entity("computer-entity", computerModel.getId());
+        //computerEntity.setPosition(-3f, 0.5f, 0);
+        //scene.addEntity(computerEntity);
 //
 //        pointEntity = new Entity("pointEntity-entity", coneModel.getId());
 //        pointEntity.setPosition(0, 0, -2);
