@@ -4,24 +4,17 @@ import Engine.sound.SoundBuffer;
 import Engine.sound.SoundListener;
 import Engine.sound.SoundManager;
 import Engine.sound.SoundSource;
-import imgui.ImGui;
-import imgui.ImGuiIO;
-import imgui.flag.ImGuiCond;
 import org.joml.Math;
 import org.lwjgl.openal.AL11;
-import org.lwjglx.debug.Log;
 import org.tinylog.Logger;
-import org.tinylog.core.LogEntry;
 import Engine.*;
 import Engine.Window;
 import Engine.graph.*;
 import Engine.scene.*;
 import Engine.scene.lights.*;
 
-import java.awt.*;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+
 import org.joml.*;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -34,7 +27,7 @@ public class Main implements IAppLogic
 
     private Entity[][] terrainEntities;
     private Entity cubeEntity;
-    private Entity testEntity;
+    private Entity ospreyEntity;
     private Entity pointEntity;
     private Entity spotEntity;
     private Entity dirEntity;
@@ -136,21 +129,21 @@ public class Main implements IAppLogic
                 scene.getTextureCache(), false);
         scene.addModel(coneModel);
 
-        Model testModel = ModelLoader.loadModel("test-model",
-                "resources/models/test/osprey.mdl",
+        Model ospreyModel = ModelLoader.loadModel("osprey-model",
+                "resources/models/osprey/osprey.mdl",
                 scene.getTextureCache(), false);
-        scene.addModel(testModel);
+        scene.addModel(ospreyModel);
 
         cubeEntity = new Entity("cube-entity", cubeModel.getId());
         cubeEntity.setPosition(0, 0, -2);
         scene.addEntity(cubeEntity);
 
-        testEntity = new Entity("test-entity", testModel.getId());
-        testEntity.setPosition(-8, 3, 2);
-        //animationData = new AnimationData(testModel.getAnimationList().get(0));
+        ospreyEntity = new Entity("osprey-entity", ospreyModel.getId());
+        ospreyEntity.setPosition(0, 3, 0); //-8, 3, 2
+        //animationData = new AnimationData(ospreyModel.getAnimationList().get(0));
         //testEntity.setAnimationData(animationData);
         //testEntity.updateModelMatrix();
-        scene.addEntity(testEntity);
+        scene.addEntity(ospreyEntity);
 //
 //        pointEntity = new Entity("pointEntity-entity", coneModel.getId());
 //        pointEntity.setPosition(0, 0, -2);
@@ -203,8 +196,8 @@ public class Main implements IAppLogic
         cubeEntity.setPosition(0, 0.0f, -0.7f);
         cubeEntity.updateModelMatrix(); // idk why we need this, but we do :3
 
-        testEntity.setScale(0.01f);
-        testEntity.updateModelMatrix();
+        ospreyEntity.setScale(0.01f);
+        ospreyEntity.updateModelMatrix();
 
         String wallNoNormalsModelId = "quad-no-normals-model";
         Model quadModelNoNormals = ModelLoader.loadModel(wallNoNormalsModelId, "resources/models/wall/wall_nonormals.obj",
@@ -303,15 +296,15 @@ public class Main implements IAppLogic
 
     @Override
     public void update(Window window, Scene scene, long diffTimeMillis) {
-        /*
+
         rotation += 1.5;
         if (rotation > 360) {
             rotation = 0;
         }
-        testEntity.setRotation(1, 1, 1, (float) Math.toRadians(rotation));
-         */
+        ospreyEntity.setRotation(1, 1, 1, (float) Math.toRadians(rotation));
 
-        //cubeEntity.updateModelMatrix();
+
+        ospreyEntity.updateModelMatrix();
 
         //TODO: There are better ways to do this >w<
 //        SceneLights sceneLights = scene.getSceneLights();
