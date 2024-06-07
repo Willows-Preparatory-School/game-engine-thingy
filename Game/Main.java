@@ -302,20 +302,20 @@ public class Main implements IAppLogic
         scene.addEntity(cubeEntity);
 
         Model ospreyModel = ModelLoader.loadModel("osprey-model",
-                "resources/models/osprey/ospreyt.mdl",
+                "resources/models/osprey/osprey.mdl",
                 scene.getTextureCache(), scene.getMaterialCache(), false);
         scene.addModel(ospreyModel);
         ospreyEntity = new Entity("osprey-entity", ospreyModel.getId());
-        ospreyEntity.setPosition(0, 3, 0); //-8, 3, 2
+        ospreyEntity.setPosition(0, 5, 5); //-8, 3, 2
         ospreyEntity.setScale(0.01f);
         ospreyEntity.updateModelMatrix();
         scene.addEntity(ospreyEntity);
 
-        Model computerModel = ModelLoader.loadModel("osprey-model",
+        Model computerModel = ModelLoader.loadModel("computer-model",
                 "resources/models/computer/computer.obj",
                 scene.getTextureCache(), scene.getMaterialCache(), false);
         scene.addModel(computerModel);
-        computerEntity = new Entity("osprey-entity", computerModel.getId());
+        computerEntity = new Entity("computer-entity", computerModel.getId());
         computerEntity.setPosition(0, 2, 1); //-8, 3, 2
         //computerEntity.setScale(0.01f);
         computerEntity.updateModelMatrix();
