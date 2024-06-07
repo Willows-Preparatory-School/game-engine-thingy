@@ -4,6 +4,10 @@ import org.joml.Vector2f;
 
 import static org.lwjgl.glfw.GLFW.*;
 
+import org.joml.Vector2f;
+
+import static org.lwjgl.glfw.GLFW.*;
+
 public class MouseInput {
 
     private Vector2f currentPos;

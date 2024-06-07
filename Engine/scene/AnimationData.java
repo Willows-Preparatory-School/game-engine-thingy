@@ -5,6 +5,7 @@ import org.joml.Matrix4f;
 
 import java.util.Arrays;
 
+
 public class AnimationData {
 
     public static final Matrix4f[] DEFAULT_BONES_MATRICES = new Matrix4f[ModelLoader.MAX_BONES];

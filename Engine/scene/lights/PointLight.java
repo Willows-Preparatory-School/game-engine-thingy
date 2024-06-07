@@ -2,6 +2,7 @@ package Engine.scene.lights;
 
 import org.joml.Vector3f;
 
+
 public class PointLight {
 
     private Attenuation attenuation;

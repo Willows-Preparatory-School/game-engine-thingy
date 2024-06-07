@@ -1,103 +1,80 @@
 package Engine.graph;
 
-import Engine.scene.AnimationData;
-import org.joml.Matrix4f;
-import org.joml.Vector3f;
-import Engine.scene.Entity;
-import Engine.scene.Fog;
+import org.lwjgl.system.MemoryUtil;
 import Engine.scene.*;
 
 import java.nio.ByteBuffer;
 import java.util.*;
 
 import static org.lwjgl.opengl.GL43.*;
-import org.joml.Vector4f;
-import Engine.scene.lights.*;
-import org.lwjgl.system.MemoryUtil;
-import org.tinylog.Logger;
 
-public class SceneRender {
+public class ShadowRender
+{
 
-    public static final int MAX_DRAW_ELEMENTS = 100;
-    public static final int MAX_ENTITIES = 50;
     private static final int COMMAND_SIZE = 5 * 4;
-    private static final int MAX_MATERIALS = 20;
-    private static final int MAX_TEXTURES = 16;
     private int animDrawCount;
     private int animRenderBufferHandle;
+    private ArrayList<CascadeShadow> cascadeShadows;
     private Map<String, Integer> entitiesIdxMap;
     private ShaderProgram shaderProgram;
+    private ShadowBuffer shadowBuffer;
     private int staticDrawCount;
     private int staticRenderBufferHandle;
     private UniformsMap uniformsMap;
 
-    public SceneRender() {
+    public ShadowRender() {
         List<ShaderProgram.ShaderModuleData> shaderModuleDataList = new ArrayList<>();
-        shaderModuleDataList.add(new ShaderProgram.ShaderModuleData("resources/shaders/scene.vert", GL_VERTEX_SHADER));
-        shaderModuleDataList.add(new ShaderProgram.ShaderModuleData("resources/shaders/scene.frag", GL_FRAGMENT_SHADER));
+        shaderModuleDataList.add(new ShaderProgram.ShaderModuleData("resources/shaders/shadow.vert", GL_VERTEX_SHADER));
         shaderProgram = new ShaderProgram(shaderModuleDataList);
+
+        shadowBuffer = new ShadowBuffer();
+
+        cascadeShadows = new ArrayList<>();
+        for (int i = 0; i < CascadeShadow.SHADOW_MAP_CASCADE_COUNT; i++) {
+            CascadeShadow cascadeShadow = new CascadeShadow();
+            cascadeShadows.add(cascadeShadow);
+        }
+
         createUniforms();
         entitiesIdxMap = new HashMap<>();
     }
 
     public void cleanup() {
         shaderProgram.cleanup();
+        shadowBuffer.cleanup();
         glDeleteBuffers(staticRenderBufferHandle);
         glDeleteBuffers(animRenderBufferHandle);
     }
 
     private void createUniforms() {
         uniformsMap = new UniformsMap(shaderProgram.getProgramId());
-        uniformsMap.createUniform("projectionMatrix");
-        uniformsMap.createUniform("viewMatrix");
+        uniformsMap.createUniform("projViewMatrix");
 
-        for (int i = 0; i < MAX_TEXTURES; i++) {
-            uniformsMap.createUniform("txtSampler[" + i + "]");
-        }
-
-        for (int i = 0; i < MAX_MATERIALS; i++) {
-            String name = "materials[" + i + "]";
-            uniformsMap.createUniform(name + ".diffuse");
-            uniformsMap.createUniform(name + ".specular");
-            uniformsMap.createUniform(name + ".reflectance");
-            uniformsMap.createUniform(name + ".normalMapIdx");
-            uniformsMap.createUniform(name + ".textureIdx");
-        }
-
-        for (int i = 0; i < MAX_DRAW_ELEMENTS; i++) {
+        for (int i = 0; i < SceneRender.MAX_DRAW_ELEMENTS; i++) {
             String name = "drawElements[" + i + "]";
             uniformsMap.createUniform(name + ".modelMatrixIdx");
-            uniformsMap.createUniform(name + ".materialIdx");
         }
 
-        for (int i = 0; i < MAX_ENTITIES; i++) {
+        for (int i = 0; i < SceneRender.MAX_ENTITIES; i++) {
             uniformsMap.createUniform("modelMatrices[" + i + "]");
         }
     }
 
-    public void render(Scene scene, RenderBuffers renderBuffers, GBuffer gBuffer) {
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, gBuffer.getGBufferId());
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glViewport(0, 0, gBuffer.getWidth(), gBuffer.getHeight());
-        glDisable(GL_BLEND);
+    public List<CascadeShadow> getCascadeShadows() {
+        return cascadeShadows;
+    }
+
+    public ShadowBuffer getShadowBuffer() {
+        return shadowBuffer;
+    }
+
+    public void render(Scene scene, RenderBuffers renderBuffers) {
+        CascadeShadow.updateCascadeShadows(cascadeShadows, scene);
+
+        glBindFramebuffer(GL_FRAMEBUFFER, shadowBuffer.getDepthMapFBO());
+        glViewport(0, 0, ShadowBuffer.SHADOW_MAP_WIDTH, ShadowBuffer.SHADOW_MAP_HEIGHT);
 
         shaderProgram.bind();
-
-        uniformsMap.setUniform("projectionMatrix", scene.getProjection().getProjMatrix());
-        uniformsMap.setUniform("viewMatrix", scene.getCamera().getViewMatrix());
-
-        TextureCache textureCache = scene.getTextureCache();
-        List<Texture> textures = textureCache.getAll().stream().toList();
-        int numTextures = textures.size();
-        if (numTextures > MAX_TEXTURES) {
-            Logger.warn("Only " + MAX_TEXTURES + " textures can be used");
-        }
-        for (int i = 0; i < Math.min(MAX_TEXTURES, numTextures); i++) {
-            uniformsMap.setUniform("txtSampler[" + i + "]", i);
-            Texture texture = textures.get(i);
-            glActiveTexture(GL_TEXTURE0 + i);
-            texture.bind();
-        }
 
         int entityIdx = 0;
         for (Model model : scene.getModelMap().values()) {
@@ -106,6 +83,11 @@ public class SceneRender {
                 uniformsMap.setUniform("modelMatrices[" + entityIdx + "]", entity.getModelMatrix());
                 entityIdx++;
             }
+        }
+
+        for (int i = 0; i < CascadeShadow.SHADOW_MAP_CASCADE_COUNT; i++) {
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, shadowBuffer.getDepthMapTexture().getIds()[i], 0);
+            glClear(GL_DEPTH_BUFFER_BIT);
         }
 
         // Static meshes
@@ -119,14 +101,20 @@ public class SceneRender {
                 for (Entity entity : entities) {
                     String name = "drawElements[" + drawElement + "]";
                     uniformsMap.setUniform(name + ".modelMatrixIdx", entitiesIdxMap.get(entity.getId()));
-                    uniformsMap.setUniform(name + ".materialIdx", meshDrawData.materialIdx());
                     drawElement++;
                 }
             }
         }
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, staticRenderBufferHandle);
         glBindVertexArray(renderBuffers.getStaticVaoId());
-        glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, 0, staticDrawCount, 0);
+        for (int i = 0; i < CascadeShadow.SHADOW_MAP_CASCADE_COUNT; i++) {
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, shadowBuffer.getDepthMapTexture().getIds()[i], 0);
+
+            CascadeShadow shadowCascade = cascadeShadows.get(i);
+            uniformsMap.setUniform("projViewMatrix", shadowCascade.getProjViewMatrix());
+
+            glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, 0, staticDrawCount, 0);
+        }
 
         // Animated meshes
         drawElement = 0;
@@ -139,17 +127,21 @@ public class SceneRender {
                 Entity entity = animMeshDrawData.entity();
                 String name = "drawElements[" + drawElement + "]";
                 uniformsMap.setUniform(name + ".modelMatrixIdx", entitiesIdxMap.get(entity.getId()));
-                uniformsMap.setUniform(name + ".materialIdx", meshDrawData.materialIdx());
                 drawElement++;
             }
         }
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, animRenderBufferHandle);
         glBindVertexArray(renderBuffers.getAnimVaoId());
-        glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, 0, animDrawCount, 0);
+        for (int i = 0; i < CascadeShadow.SHADOW_MAP_CASCADE_COUNT; i++) {
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, shadowBuffer.getDepthMapTexture().getIds()[i], 0);
+
+            CascadeShadow shadowCascade = cascadeShadows.get(i);
+            uniformsMap.setUniform("projViewMatrix", shadowCascade.getProjViewMatrix());
+
+            glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, 0, animDrawCount, 0);
+        }
 
         glBindVertexArray(0);
-        glEnable(GL_BLEND);
-        shaderProgram.unbind();
     }
 
     private void setupAnimCommandBuffer(Scene scene) {
@@ -164,6 +156,8 @@ public class SceneRender {
         ByteBuffer commandBuffer = MemoryUtil.memAlloc(numMeshes * COMMAND_SIZE);
         for (Model model : modelList) {
             for (RenderBuffers.MeshDrawData meshDrawData : model.getMeshDrawDataList()) {
+                RenderBuffers.AnimMeshDrawData animMeshDrawData = meshDrawData.animMeshDrawData();
+                Entity entity = animMeshDrawData.entity();
                 // count
                 commandBuffer.putInt(meshDrawData.vertices());
                 // instanceCount
@@ -192,7 +186,6 @@ public class SceneRender {
         setupEntitiesData(scene);
         setupStaticCommandBuffer(scene);
         setupAnimCommandBuffer(scene);
-        setupMaterialsUniform(scene.getTextureCache(), scene.getMaterialCache());
     }
 
     private void setupEntitiesData(Scene scene) {
@@ -207,43 +200,10 @@ public class SceneRender {
         }
     }
 
-    private void setupMaterialsUniform(TextureCache textureCache, MaterialCache materialCache) {
-        List<Texture> textures = textureCache.getAll().stream().toList();
-        int numTextures = textures.size();
-        if (numTextures > MAX_TEXTURES) {
-            Logger.warn("Only " + MAX_TEXTURES + " textures can be used");
-        }
-        Map<String, Integer> texturePosMap = new HashMap<>();
-        for (int i = 0; i < Math.min(MAX_TEXTURES, numTextures); i++) {
-            texturePosMap.put(textures.get(i).getTexturePath(), i);
-        }
-
-        shaderProgram.bind();
-        List<Material> materialList = materialCache.getMaterialsList();
-        int numMaterials = materialList.size();
-        for (int i = 0; i < numMaterials; i++) {
-            Material material = materialCache.getMaterial(i);
-            String name = "materials[" + i + "]";
-            uniformsMap.setUniform(name + ".diffuse", material.getDiffuseColor());
-            uniformsMap.setUniform(name + ".specular", material.getSpecularColor());
-            uniformsMap.setUniform(name + ".reflectance", material.getReflectance());
-            String normalMapPath = material.getNormalMapPath();
-            int idx = 0;
-            if (normalMapPath != null) {
-                idx = texturePosMap.computeIfAbsent(normalMapPath, k -> 0);
-            }
-            uniformsMap.setUniform(name + ".normalMapIdx", idx);
-            Texture texture = textureCache.getTexture(material.getTexturePath());
-            idx = texturePosMap.computeIfAbsent(texture.getTexturePath(), k -> 0);
-            uniformsMap.setUniform(name + ".textureIdx", idx);
-        }
-        shaderProgram.unbind();
-    }
-
     private void setupStaticCommandBuffer(Scene scene) {
         List<Model> modelList = scene.getModelMap().values().stream().filter(m -> !m.isAnimated()).toList();
         int numMeshes = 0;
-        for (Model model : modelList) {
+        for (Model model : scene.getModelMap().values()) {
             numMeshes += model.getMeshDrawDataList().size();
         }
 
@@ -277,4 +237,5 @@ public class SceneRender {
 
         MemoryUtil.memFree(commandBuffer);
     }
+
 }

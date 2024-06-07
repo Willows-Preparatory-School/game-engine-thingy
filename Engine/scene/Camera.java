@@ -5,6 +5,7 @@ import org.joml.*;
 public class Camera {
 
     private Vector3f direction;
+    private Matrix4f invViewMatrix;
     private Vector3f position;
     private Vector3f right;
     private Vector2f rotation;
@@ -17,12 +18,17 @@ public class Camera {
         up = new Vector3f();
         position = new Vector3f();
         viewMatrix = new Matrix4f();
+        invViewMatrix = new Matrix4f();
         rotation = new Vector2f();
     }
 
     public void addRotation(float x, float y) {
         rotation.add(x, y);
         recalculate();
+    }
+
+    public Matrix4f getInvViewMatrix() {
+        return invViewMatrix;
     }
 
     public Vector3f getPosition() {
@@ -74,6 +80,7 @@ public class Camera {
                 .rotateX(rotation.x)
                 .rotateY(rotation.y)
                 .translate(-position.x, -position.y, -position.z);
+        invViewMatrix.set(viewMatrix).invert();
     }
 
     public void setPosition(float x, float y, float z) {

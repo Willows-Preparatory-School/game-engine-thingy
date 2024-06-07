@@ -58,7 +58,6 @@ public class Engine {
     private void cleanup() {
         appLogic.cleanup();
         render.cleanup();
-        scene.cleanup();
         window.cleanup();
     }
 
@@ -87,7 +86,7 @@ public class Engine {
 
             if (targetFps <= 0 || deltaFps >= 1) {
                 window.getMouseInput().input();
-                boolean inputConsumed = iGuiInstance != null ? iGuiInstance.handleGuiInput(scene, window) : false;
+                boolean inputConsumed = iGuiInstance != null && iGuiInstance.handleGuiInput(scene, window);
                 appLogic.input(window, scene, now - initialTime, inputConsumed);
             }
 
@@ -118,13 +117,4 @@ public class Engine {
         running = false;
     }
 
-    public boolean isDevMode()
-    {
-        return devMode;
-    }
-
-    public boolean isServerMode()
-    {
-        return serverMode;
-    }
 }

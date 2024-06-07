@@ -13,7 +13,6 @@ import Engine.graph.*;
 import Engine.scene.*;
 import Engine.scene.lights.*;
 
-import java.awt.*;
 import java.util.Arrays;
 
 import org.joml.*;
@@ -37,6 +36,7 @@ public class Main implements IAppLogic
 
     private Vector4f displInc = new Vector4f();
     private float rotation;
+    private float lightAngle;
     private LightControls lightControls;
     private SoundSource playerSoundSource;
     private SoundManager soundMgr;
@@ -118,23 +118,28 @@ public class Main implements IAppLogic
     {
         Logger.info("Starting game init...");
 
-        String quadModelId = "quad-model";
-        Model quadModel = ModelLoader.loadModel("quad-model", "resources/models/quad/quad.obj",
-                scene.getTextureCache(), false);
-        scene.addModel(quadModel);
+        /*
+        String terrainModelId = "terrain";
+        Model terrainModel = ModelLoader.loadModel(terrainModelId, "resources/models/terrain/terrain.obj",
+                scene.getTextureCache(), scene.getMaterialCache(), false);
+        scene.addModel(terrainModel);
+        Entity terrainEntity = new Entity("terrainEntity", terrainModelId);
+        terrainEntity.setScale(100.0f);
+        terrainEntity.updateModelMatrix();
+        scene.addEntity(terrainEntity);
 
-        Model cubeModel = ModelLoader.loadModel("cube-model", "resources/models/cube/cube.obj",
-                scene.getTextureCache(), false);
-        scene.addModel(cubeModel);
+        Model cubeModel = ModelLoader.loadModel("cube-model", "resources/models/computer/computer.obj",
+                scene.getTextureCache(), scene.getMaterialCache(), false);
+        //scene.addModel(cubeModel);
 
-        Model coneModel = ModelLoader.loadModel("cone-model", "resources/models/cone/cone.obj",
-                scene.getTextureCache(), false);
-        scene.addModel(coneModel);
+        //Model coneModel = ModelLoader.loadModel("cone-model", "resources/models/cone/cone.obj",
+        //        scene.getTextureCache(), scene.getMaterialCache(), false);
+        //scene.addModel(coneModel);
 
         Model ospreyModel = ModelLoader.loadModel("osprey-model",
-                "resources/models/osprey/osprey.mdl",
-                scene.getTextureCache(), false);
-        scene.addModel(ospreyModel);
+                "resources/models/osprey/ospreyt.mdl",
+                scene.getTextureCache(), scene.getMaterialCache(), false);
+        //scene.addModel(ospreyModel);
 
         //Model computerModel = ModelLoader.loadModel("computer-model",
                 //"resources/models/box/box2.obj",
@@ -143,14 +148,23 @@ public class Main implements IAppLogic
 
         cubeEntity = new Entity("cube-entity", cubeModel.getId());
         cubeEntity.setPosition(0, 0, -2);
-        scene.addEntity(cubeEntity);
+        //scene.addEntity(cubeEntity);
+
+        // move model for easy viewing.
+        //cubeEntity.setRotation(0, 1, 0, 80);
+        cubeEntity.setPosition(0, 0.0f, -0.7f);
+        cubeEntity.updateModelMatrix(); // idk why we need this, but we do :3
 
         ospreyEntity = new Entity("osprey-entity", ospreyModel.getId());
         ospreyEntity.setPosition(0, 3, 0); //-8, 3, 2
         //animationData = new AnimationData(ospreyModel.getAnimationList().get(0));
         //testEntity.setAnimationData(animationData);
         //testEntity.updateModelMatrix();
-        scene.addEntity(ospreyEntity);
+        //scene.addEntity(ospreyEntity);
+
+
+        //! IMPORTANT
+        render.setupData(scene);
 
         //computerEntity = new Entity("computer-entity", computerModel.getId());
         //computerEntity.setPosition(-3f, 0.5f, 0);
@@ -165,7 +179,6 @@ public class Main implements IAppLogic
 //        dirEntity = new Entity("dirEntity-entity", coneModel.getId());
 //        dirEntity.setPosition(0, 0, -2);
 //        scene.addEntity(dirEntity);
-
 
         int numRows = NUM_CHUNKS * 2 + 1;
         int numCols = numRows;
@@ -193,7 +206,8 @@ public class Main implements IAppLogic
 //        scene.setGuiInstance(lightControls);
 
         if (false){ // skybox toggle
-            SkyBox skyBox = new SkyBox("resources/models/skybox/skybox.obj", scene.getTextureCache());
+            SkyBox skyBox = new SkyBox("resources/models/skybox/skybox.obj",
+                    scene.getTextureCache(), scene.getMaterialCache());
             skyBox.getSkyBoxEntity().setScale(100);
             scene.setSkyBox(skyBox);
         }
@@ -212,7 +226,7 @@ public class Main implements IAppLogic
 
         String wallNoNormalsModelId = "quad-no-normals-model";
         Model quadModelNoNormals = ModelLoader.loadModel(wallNoNormalsModelId, "resources/models/wall/wall_nonormals.obj",
-                scene.getTextureCache(), false);
+                scene.getTextureCache(), scene.getMaterialCache(), false);
         scene.addModel(quadModelNoNormals);
 
         Entity wallLeftEntity = new Entity("wallLeftEntity", wallNoNormalsModelId);
@@ -223,7 +237,7 @@ public class Main implements IAppLogic
 
         String wallModelId = "quad-model-normals";
         Model quadModel2 = ModelLoader.loadModel(wallModelId, "resources/models/wall/wall.obj",
-                scene.getTextureCache(), false);
+                scene.getTextureCache(), scene.getMaterialCache(), false);
         scene.addModel(quadModel2);
 
         Entity wallRightEntity = new Entity("wallRightEntity", wallModelId);
@@ -247,6 +261,125 @@ public class Main implements IAppLogic
         dirLight.setPosition(1, 1, 0);
         dirLight.setIntensity(1.0f);
         scene.setSceneLights(sceneLights);
+     */
+
+        String terrainModelId = "terrain";
+        Model terrainModel = ModelLoader.loadModel(terrainModelId, "resources/models/terrain/terrain.obj",
+                scene.getTextureCache(), scene.getMaterialCache(), false);
+        scene.addModel(terrainModel);
+        Entity terrainEntity = new Entity("terrainEntity", terrainModelId);
+        terrainEntity.setScale(100.0f);
+        terrainEntity.updateModelMatrix();
+        scene.addEntity(terrainEntity);
+
+        /*
+        String bobModelId = "bobModel";
+        Model bobModel = ModelLoader.loadModel(bobModelId, "resources/models/bob/boblamp.md5mesh",
+                scene.getTextureCache(), scene.getMaterialCache(), true);
+        scene.addModel(bobModel);
+        Entity bobEntity = new Entity("bobEntity-1", bobModelId);
+        bobEntity.setScale(0.05f);
+        bobEntity.updateModelMatrix();
+        animationData1 = new AnimationData(bobModel.getAnimationList().get(0));
+        bobEntity.setAnimationData(animationData1);
+        scene.addEntity(bobEntity);
+
+        Entity bobEntity2 = new Entity("bobEntity-2", bobModelId);
+        bobEntity2.setPosition(2, 0, 0);
+        bobEntity2.setScale(0.025f);
+        bobEntity2.updateModelMatrix();
+        animationData2 = new AnimationData(bobModel.getAnimationList().get(0));
+        bobEntity2.setAnimationData(animationData2);
+        scene.addEntity(bobEntity2);
+         */
+
+        Model cubeModel = ModelLoader.loadModel("cube-model", "resources/models/cube/cube.obj",
+                scene.getTextureCache(), scene.getMaterialCache(), false);
+        scene.addModel(cubeModel);
+        cubeEntity = new Entity("cube-entity", cubeModel.getId());
+        cubeEntity.setPosition(0, 2, -1);
+        cubeEntity.updateModelMatrix();
+        scene.addEntity(cubeEntity);
+
+        Model ospreyModel = ModelLoader.loadModel("osprey-model",
+                "resources/models/osprey/ospreyt.mdl",
+                scene.getTextureCache(), scene.getMaterialCache(), false);
+        scene.addModel(ospreyModel);
+        ospreyEntity = new Entity("osprey-entity", ospreyModel.getId());
+        ospreyEntity.setPosition(0, 3, 0); //-8, 3, 2
+        ospreyEntity.setScale(0.01f);
+        ospreyEntity.updateModelMatrix();
+        scene.addEntity(ospreyEntity);
+
+        Model computerModel = ModelLoader.loadModel("osprey-model",
+                "resources/models/computer/computer.obj",
+                scene.getTextureCache(), scene.getMaterialCache(), false);
+        scene.addModel(computerModel);
+        computerEntity = new Entity("osprey-entity", computerModel.getId());
+        computerEntity.setPosition(0, 2, 1); //-8, 3, 2
+        //computerEntity.setScale(0.01f);
+        computerEntity.updateModelMatrix();
+        scene.addEntity(computerEntity);
+
+        String wallNoNormalsModelId = "quad-no-normals-model";
+        Model quadModelNoNormals = ModelLoader.loadModel(wallNoNormalsModelId, "resources/models/wall/wall_nonormals.obj",
+                scene.getTextureCache(), scene.getMaterialCache(), false);
+        scene.addModel(quadModelNoNormals);
+
+        Entity wallLeftEntity = new Entity("wallLeftEntity", wallNoNormalsModelId);
+        wallLeftEntity.setPosition(-3f, 1, 0);
+        wallLeftEntity.setScale(2.0f);
+        wallLeftEntity.updateModelMatrix();
+        scene.addEntity(wallLeftEntity);
+
+        String wallModelId = "quad-model-normals";
+        Model quadModel2 = ModelLoader.loadModel(wallModelId, "resources/models/wall/wall.obj",
+                scene.getTextureCache(), scene.getMaterialCache(), false);
+        scene.addModel(quadModel2);
+
+        Entity wallRightEntity = new Entity("wallRightEntity", wallModelId);
+        wallRightEntity.setPosition(3f, 1, 0);
+        wallRightEntity.setScale(2.0f);
+        wallRightEntity.updateModelMatrix();
+        scene.addEntity(wallRightEntity);
+
+        /*
+        cubeEntity2 = new Entity("cube-entity-2", cubeModel.getId());
+        cubeEntity2.setPosition(-2, 2, -1);
+        cubeEntity2.updateModelMatrix();
+        scene.addEntity(cubeEntity2);
+         */
+
+
+        render.setupData(scene); // NO MORE MODEL LOADING AFTER!!!
+
+        SceneLights sceneLights = new SceneLights();
+        AmbientLight ambientLight = sceneLights.getAmbientLight();
+        ambientLight.setIntensity(0.5f);
+        ambientLight.setColor(0.3f, 0.3f, 0.3f);
+
+        DirLight dirLight = sceneLights.getDirLight();
+        //dirLight.setPosition(0, 1, 0);
+        dirLight.setPosition(1, 1, 0);
+        dirLight.setIntensity(1.0f);
+        scene.setSceneLights(sceneLights);
+
+        if(false)
+        {
+            SkyBox skyBox = new SkyBox("resources/models/skybox/skybox.obj", scene.getTextureCache(),
+                    scene.getMaterialCache());
+            skyBox.getSkyBoxEntity().setScale(100);
+            skyBox.getSkyBoxEntity().updateModelMatrix();
+            scene.setSkyBox(skyBox);
+        }
+
+        scene.setFog(new Fog(true, new Vector3f(0.5f, 0.5f, 0.5f), 0.02f));
+
+        Camera camera = scene.getCamera();
+        camera.setPosition(-1.5f, 3.0f, 4.5f);
+        camera.addRotation((float) Math.toRadians(15.0f), (float) Math.toRadians(390.f));
+
+        lightAngle = 45.001f;
 
         if(!noSound)
             initSounds(scene.getCamera().getPosition(), scene.getCamera());
@@ -300,6 +433,12 @@ public class Main implements IAppLogic
             camera.addRotation((float) Math.toRadians(-displVec.x * MOUSE_SENSITIVITY),
                     (float) Math.toRadians(-displVec.y * MOUSE_SENSITIVITY));
         }
+
+        SceneLights sceneLights = scene.getSceneLights();
+        DirLight dirLight = sceneLights.getDirLight();
+        double angRad = Math.toRadians(lightAngle);
+        dirLight.getDirection().z = (float) Math.sin(angRad);
+        dirLight.getDirection().y = (float) Math.cos(angRad);
 
         if(!noSound)
             soundMgr.updateListenerPosition(camera);

@@ -1,6 +1,7 @@
 package Engine.scene;
 
 import Engine.IGuiInstance;
+import Engine.graph.MaterialCache;
 import Engine.graph.Mesh;
 import Engine.graph.Model;
 import Engine.graph.TextureCache;
@@ -10,45 +11,23 @@ import java.util.*;
 
 public class Scene {
 
-    private Map<String, Model> modelMap;
-    private TextureCache textureCache;
     private Camera camera;
-    private SkyBox skyBox;
+    private Fog fog;
     private IGuiInstance guiInstance;
+    private MaterialCache materialCache;
+    private Map<String, Model> modelMap;
     private Projection projection;
     private SceneLights sceneLights;
-    private Fog fog;
+    private SkyBox skyBox;
+    private TextureCache textureCache;
 
     public Scene(int width, int height) {
         modelMap = new HashMap<>();
         projection = new Projection(width, height);
         textureCache = new TextureCache();
+        materialCache = new MaterialCache();
         camera = new Camera();
         fog = new Fog();
-    }
-
-    public Camera getCamera() {
-        return camera;
-    }
-
-    public TextureCache getTextureCache() {
-        return textureCache;
-    }
-
-    public SceneLights getSceneLights() {
-        return sceneLights;
-    }
-
-    public IGuiInstance getGuiInstance() {
-        return guiInstance;
-    }
-
-    public SkyBox getSkyBox() {
-        return skyBox;
-    }
-
-    public Fog getFog() {
-        return fog;
     }
 
     public void addEntity(Entity entity) {
@@ -64,16 +43,49 @@ public class Scene {
         modelMap.put(model.getId(), model);
     }
 
-    public void cleanup() {
-        modelMap.values().forEach(Model::cleanup);
+    public Camera getCamera() {
+        return camera;
+    }
+
+    public Fog getFog() {
+        return fog;
+    }
+
+    public IGuiInstance getGuiInstance() {
+        return guiInstance;
+    }
+
+    public MaterialCache getMaterialCache() {
+        return materialCache;
     }
 
     public Map<String, Model> getModelMap() {
         return modelMap;
     }
 
+
     public Projection getProjection() {
         return projection;
+    }
+
+    public SceneLights getSceneLights() {
+        return sceneLights;
+    }
+
+    public SkyBox getSkyBox() {
+        return skyBox;
+    }
+
+    public TextureCache getTextureCache() {
+        return textureCache;
+    }
+
+    public void resize(int width, int height) {
+        projection.updateProjMatrix(width, height);
+    }
+
+    public void setFog(Fog fog) {
+        this.fog = fog;
     }
 
     public void setGuiInstance(IGuiInstance guiInstance) {
@@ -86,13 +98,5 @@ public class Scene {
 
     public void setSkyBox(SkyBox skyBox) {
         this.skyBox = skyBox;
-    }
-
-    public void setFog(Fog fog) {
-        this.fog = fog;
-    }
-
-    public void resize(int width, int height) {
-        projection.updateProjMatrix(width, height);
     }
 }

@@ -8,19 +8,21 @@ import java.util.*;
 public class Model {
 
     private final String id;
-    private List<Entity> entitiesList;
-    private List<Material> materialList;
     private List<Animation> animationList;
+    private List<Entity> entitiesList;
+    private List<MeshData> meshDataList;
+    private List<RenderBuffers.MeshDrawData> meshDrawDataList;
 
-    public Model(String id, List<Material> materialList, List<Animation> animationList) {
-        this.id = id;
+    public Model(String id, List<MeshData> meshDataList, List<Animation> animationList) {
         entitiesList = new ArrayList<>();
-        this.materialList = materialList;
+        this.id = id;
+        this.meshDataList = meshDataList;
         this.animationList = animationList;
+        meshDrawDataList = new ArrayList<>();
     }
 
-    public void cleanup() {
-        materialList.forEach(Material::cleanup);
+    public List<Animation> getAnimationList() {
+        return animationList;
     }
 
     public List<Entity> getEntitiesList() {
@@ -31,15 +33,41 @@ public class Model {
         return id;
     }
 
-    public List<Material> getMaterialList() {
-        return materialList;
+    public List<MeshData> getMeshDataList() {
+        return meshDataList;
     }
 
-    public List<Animation> getAnimationList() {
-        return animationList;
+    public List<RenderBuffers.MeshDrawData> getMeshDrawDataList() {
+        return meshDrawDataList;
     }
 
-    public record AnimatedFrame(Matrix4f[] boneMatrices) {
+    public boolean isAnimated() {
+        return animationList != null && !animationList.isEmpty();
+    }
+
+    public static class AnimatedFrame {
+        private Matrix4f[] bonesMatrices;
+        private int offset;
+
+        public AnimatedFrame(Matrix4f[] bonesMatrices) {
+            this.bonesMatrices = bonesMatrices;
+        }
+
+        public void clearData() {
+            bonesMatrices = null;
+        }
+
+        public Matrix4f[] getBonesMatrices() {
+            return bonesMatrices;
+        }
+
+        public int getOffset() {
+            return offset;
+        }
+
+        public void setOffset(int offset) {
+            this.offset = offset;
+        }
     }
 
     public record Animation(String name, double duration, List<AnimatedFrame> frames) {

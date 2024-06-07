@@ -49,4 +49,5 @@ public class SpotLight {
     public void setPointLight(PointLight pointLight) {
         this.pointLight = pointLight;
     }
+
 }

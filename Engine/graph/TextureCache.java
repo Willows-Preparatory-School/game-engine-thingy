@@ -21,6 +21,10 @@ public class TextureCache {
         return textureMap.computeIfAbsent(texturePath, Texture::new);
     }
 
+    public Collection<Texture> getAll() {
+        return textureMap.values();
+    }
+
     public Texture getTexture(String texturePath) {
         Texture texture = null;
         if (texturePath != null) {
