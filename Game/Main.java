@@ -62,7 +62,7 @@ public class Main implements IAppLogic
         windowOptions.height = 600;
         windowOptions.width = 800;
         //windowOptions.fps = 60;
-        windowOptions.antiAliasing = true;
+        windowOptions.antiAliasing = false;
 
         System.out.println("INFO: Game; running with args: " + Arrays.toString(args));
 
@@ -302,12 +302,12 @@ public class Main implements IAppLogic
         scene.addEntity(cubeEntity);
 
         Model ospreyModel = ModelLoader.loadModel("osprey-model",
-                "resources/models/osprey/osprey.mdl",
+                "resources/models/box/box2.obj", // resources/models/osprey/osprey.mdl
                 scene.getTextureCache(), scene.getMaterialCache(), false);
         scene.addModel(ospreyModel);
         ospreyEntity = new Entity("osprey-entity", ospreyModel.getId());
         ospreyEntity.setPosition(0, 5, 5); //-8, 3, 2
-        ospreyEntity.setScale(0.01f);
+        ospreyEntity.setScale(50.0f); // 0.01f
         ospreyEntity.updateModelMatrix();
         scene.addEntity(ospreyEntity);
 
