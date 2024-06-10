@@ -307,7 +307,7 @@ public class Main implements IAppLogic
         scene.addModel(ospreyModel);
         ospreyEntity = new Entity("osprey-entity", ospreyModel.getId());
         ospreyEntity.setPosition(0, 5, 5); //-8, 3, 2
-        ospreyEntity.setScale(50.0f); // 0.01f
+        ospreyEntity.setScale(50.0f); // osprey -  0.01f // box2.obj - 50.0f // 4090 - 0.1f
         ospreyEntity.updateModelMatrix();
         scene.addEntity(ospreyEntity);
 
