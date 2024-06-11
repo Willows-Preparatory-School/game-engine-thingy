@@ -4,6 +4,7 @@ import Engine.sound.SoundBuffer;
 import Engine.sound.SoundListener;
 import Engine.sound.SoundManager;
 import Engine.sound.SoundSource;
+import com.jme3.system.NativeLibraryLoader;
 import org.joml.Math;
 import org.lwjgl.openal.AL11;
 import org.tinylog.Logger;
@@ -13,6 +14,7 @@ import Engine.graph.*;
 import Engine.scene.*;
 import Engine.scene.lights.*;
 
+import java.io.File;
 import java.util.Arrays;
 
 import org.joml.*;
@@ -117,6 +119,9 @@ public class Main implements IAppLogic
     public void init(Window window, Scene scene, Render render)
     {
         Logger.info("Starting game init...");
+
+        Logger.info("Running initPhysics();");
+        PhysicsManager.initPhysics();
 
         /*
         String terrainModelId = "terrain";
@@ -269,6 +274,7 @@ public class Main implements IAppLogic
         scene.addModel(terrainModel);
         Entity terrainEntity = new Entity("terrainEntity", terrainModelId);
         terrainEntity.setScale(100.0f);
+        terrainEntity.setPosition(0 , -1f, 0);
         terrainEntity.updateModelMatrix();
         scene.addEntity(terrainEntity);
 
@@ -434,6 +440,11 @@ public class Main implements IAppLogic
                     (float) Math.toRadians(-displVec.y * MOUSE_SENSITIVITY));
         }
 
+        if(mouseInput.isLeftButtonPressed())
+        {
+            PhysicsManager.ball.applyCentralImpulse(new com.jme3.math.Vector3f(0f, 1f, 0f));
+        }
+
         SceneLights sceneLights = scene.getSceneLights();
         DirLight dirLight = sceneLights.getDirLight();
         double angRad = Math.toRadians(lightAngle);
@@ -444,14 +455,22 @@ public class Main implements IAppLogic
             soundMgr.updateListenerPosition(camera);
     }
 
+
+    com.jme3.math.Vector3f location = new com.jme3.math.Vector3f();
     @Override
     public void update(Window window, Scene scene, long diffTimeMillis) {
+        // Update physics
+        PhysicsManager.updatePhysics(PhysicsManager.PHYSICS_TIMESTEP);
+        PhysicsManager.ball.getPhysicsLocation(location);
+        System.out.println(location);
 
-        rotation += 1.5;
-        if (rotation > 360) {
-            rotation = 0;
-        }
-        ospreyEntity.setRotation(1, 1, 1, (float) Math.toRadians(rotation));
+
+        //rotation += 1.5;
+        //if (rotation > 360) {
+        //    rotation = 0;
+        //}
+        //ospreyEntity.setRotation(1, 1, 1, (float) Math.toRadians(rotation));
+        ospreyEntity.setPosition(location.x, location.y, location.z);
 
 
         ospreyEntity.updateModelMatrix();
